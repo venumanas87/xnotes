@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:xnotes/models/login_data.dart';
 import 'package:xnotes/screens/HomeScreen.dart';
+import 'package:xnotes/utils/sharedpref_data.dart';
 import 'package:xnotes/utils/uiColors.dart';
 import 'package:xnotes/widgets/card_widget.dart';
 
@@ -19,9 +20,12 @@ class _LoginState extends State<LoginScreen>{
 
   String uid;
   final myController = TextEditingController();
+  bool redirect = false;
+  bool existing;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.darkBg,
       body: Center(
         child: Card(
@@ -30,19 +34,24 @@ class _LoginState extends State<LoginScreen>{
           ),
           color: AppColors.lightBg,
           child: FractionallySizedBox(
-            heightFactor: 0.6,
+            heightFactor: 0.5,
             widthFactor: 0.9,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Enter a unique id",
-                  style: GoogleFonts.poppins(
-                      textStyle: TextStyle(color: Color(0xccffffff),fontSize: 20)
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
+                Consumer<LoginData>(
+                  builder: (context,data,child){
+                    return Container(
+                      margin: EdgeInsets.all(20),
+                      child: Text(
+                        data.text,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                            textStyle: TextStyle(color: Color(0xccffffff),fontSize: 20)
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 Container(
                   margin: EdgeInsets.all(20),
@@ -50,7 +59,6 @@ class _LoginState extends State<LoginScreen>{
                     builder:(context,data,child){
                       return TextField(
                         controller: myController,
-                        onChanged: catchChange,
                         cursorColor: Colors.white,
                         style: GoogleFonts.poppins(
                             textStyle: TextStyle(color: Color.fromARGB(
@@ -71,46 +79,8 @@ class _LoginState extends State<LoginScreen>{
                 SizedBox(
                   height: 30,
                 ),
-                GestureDetector(
-                  onTap: (){
-                    checkifUnique();
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100)
-                        ),
-                        color: AppColors.accent,
-                        child: SizedBox(
-                          height: 60,
-                          width: 60,
-                          child: Center(
-                            child: Text(
-                              ">",
-                            style: GoogleFonts.poppins(
-                                textStyle: TextStyle(color: Colors.white,fontSize: 25,fontWeight: FontWeight.bold)
-                            ),
-                          ),
-                        ),
-                      )
-                      ),
-                    Consumer<LoginData>(
-                      builder: (context,data,child){
-                       return Visibility(
-                         visible: !data.found,
-                         child: SizedBox(
-                           height: 70,
-                           width: 70,
-                           child: CircularProgressIndicator(
-                           ),
-                         ),
-                       );
-                      },
-                    )
-                    ]
-                  ),
+                FloatingActionButton(
+                  onPressed: (){},
                 )
               ],
             ),
@@ -127,32 +97,75 @@ class _LoginState extends State<LoginScreen>{
     var loginInfo = Provider.of<LoginData>(context,listen: false);
     loginInfo.setFalse();
     loginInfo.setNormalColor();
+    uid = myController.text;
    var result = await firestore.collection("xnotes").doc("quickyquick").collection("ids")
        .where("id",isEqualTo: myController.text)
        .get();
 
+    redirect = true;
+
     if(result.docs.isNotEmpty){
-      print("toggle");
+      print("existing user");
+      existing = true;
       loginInfo.setTrue();
-      loginInfo.setErrorColor();
+      loginInfo.setSuccessColor();
+      loginInfo.setTextEnterPassword();
       print(loginInfo.found);
     }else{
-      print("disposed ${loginInfo.found}");
+      print("new user");
+      existing = false;
       loginInfo.setTrue();
-      loginInfo.dispose();
-      firestore.collection("xnotes").doc("quickyquick").collection("ids")
-          .add({
-        "id" : myController.text
-      });
+      loginInfo.setSuccessColor();
+      loginInfo.setTextPassword();
+      // firestore.collection("xnotes").doc("quickyquick").collection("ids")
+      //     .add({
+      //   "id" : myController.text
+      // });
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(true)));
+     // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(true)));
     }
+
+
+    myController.clear();
 
 
 
   }
 
-  void catchChange(String value) {
+  void continueLogin() async{
+
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    var loginInfo = Provider.of<LoginData>(context,listen: false);
+    loginInfo.setFalse();
+    loginInfo.setNormalColor();
+    String pass = myController.text;
+    var result = await firestore.collection("xnotes").doc("quickyquick").collection("ids")
+        .where("id",isEqualTo: uid)
+        .get();
+
+    if(existing){
+      if(pass == result.docs[0].get("pass")){
+        print("passed");
+        SharedPref().saveAppState(uid, pass);
+        Navigator.pop(context);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(true)));
+      }else{
+        loginInfo.setErrorColor();
+      }
+    }else{
+      firestore.collection("xnotes").doc("quickyquick").collection("ids")
+          .add({
+        "id" : uid,
+        "pass" : pass
+      });
+
+      SharedPref().saveAppState(uid, pass);
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(true)));
+
+    }
+
+
 
   }
 

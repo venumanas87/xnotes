@@ -14,27 +14,24 @@ class CardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: AppColors.lightBg,
-      child: InkWell(
-        onTap: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) =>
-              ChangeNotifierProvider(
-                  child: LoginScreen(),
-                create: (context) => LoginData(),
-              )));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: SizedBox(
+          height: 200,
+
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Flexible(
+              Expanded(
                 child: Text(
                   heading,
                   style: GoogleFonts.poppins(
                       textStyle: TextStyle(color: Color(0xffffffff))
                   ),
                 ),
-              )
-            ],
+              ),
+
+            ]
           ),
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:xnotes/screens/HomeScreen.dart';
 import 'package:xnotes/screens/LoginScreen.dart';
+import 'package:xnotes/utils/sharedpref_data.dart';
 import 'package:xnotes/utils/uiColors.dart';
 import 'package:xnotes/widgets/card_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +12,13 @@ import 'models/login_data.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(
+      MaterialApp(home: MyApp(),
+  theme: ThemeData(
+    primaryColor: AppColors.accent,
+    primaryColorDark: AppColors.darkBg,
+    accentColor: AppColors.accent
+  ),));
 }
 
 class MyApp extends StatefulWidget {
@@ -38,22 +45,31 @@ class _AppState extends State<MyApp> {
 
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
-          return MaterialApp(
-            home: ChangeNotifierProvider(
-              child: LoginScreen(),
-              create: (context) => LoginData(),
-            ),
-            theme: ThemeData(
-              primaryColor: AppColors.accent,
-              primaryColorDark: AppColors.darkBg,
-              accentColor: AppColors.accent
-            ),
+          return FutureBuilder<User>(
+              future: SharedPref().getAppState(),
+              builder: (context,snap){
+                if (snap.connectionState == ConnectionState.done){
+                  if(snap.data.id == null) {
+                    return ChangeNotifierProvider(
+                      child: LoginScreen(),
+                      create: (context) => LoginData(),
+                    );
+                  }else{
+                    print("found data ${snap.data.id}");
+                    return HomeScreen(true);
+                  }
+                }
+                return HomeScreen(false);
+          }
           );
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return HomeScreen(false);
+        return Center(
+          child: CircularProgressIndicator(),
+        );
       },
     );
   }
+
 }

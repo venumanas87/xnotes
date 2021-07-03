@@ -15,34 +15,52 @@ class HomeScreen extends StatelessWidget {
     List<String> list = [];
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    firestore.collection("class").doc("3").collection("community").get().then((value)=>{
+    firestore.collection("class").doc("3").collection("community").get().then((
+        value) =>
+    {
       value.docs.forEach((element) {
         list.add(element.toString());
-
       })
     });
-    if(isComp) return Scaffold(
-            backgroundColor: AppColors.darkBg,
-            body: Stack(
-                children: [
-                  StreamBuilder(
-                      stream: firestore.collection("class").doc("3").collection("community").snapshots(),
-                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
+    if (isComp) {
+      return Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){},
+        ),
+        backgroundColor: AppColors.darkBg,
+        body: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 400, 0, 0),
+          child: Stack(
+            children: [
+              FutureBuilder(
+                  future: firestore.collection("class").doc("3").collection(
+                      "community").get(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
-                        return ListView(
-                            children: snapshot.data.docs.map((document) {
-                              return CardWidget(document["postTitle"]);
-                            }).toList()
-                        );
-                      }
-                  ),
+                    return ListView.builder(
+                      itemCount: snapshot.data.docs.length,
+                      itemBuilder: (context,index){
+                        var obj = snapshot.data.docs[index];
+                        return CardWidget(obj["postTitle"]);
+                      },
+                    );
+                  }
+              ),
 
-                ]
-            ));
+            ]
+            ),
+        ));
+  }else{
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
   }
 }
