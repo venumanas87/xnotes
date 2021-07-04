@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
           floatingActionButton: OpenContainer(
             closedShape: CircleBorder(),
             closedColor: AppColors.darkBg,
-            openBuilder: (context,builder) => NewdataScreen(),
+            openBuilder: (context,builder) => NewdataScreen("",""),
             closedBuilder: (context,open) => FloatingActionButton(
               child: Icon(
                 Icons.add,
@@ -47,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: AppColors.darkBg,
           body: Stack(
               children: [
-                FutureBuilder(
-                    future: firestore.collection("xnotes").doc("quickyquick").collection("ids").doc(uid).collection("notes").get(),
+               StreamBuilder(
+                    stream: firestore.collection("xnotes").doc("quickyquick").collection("ids").doc(uid).collection("notes").snapshots(),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return Center(
@@ -76,9 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             double height;
                             int words = title.split(" ").length;
                             if(words < 2 && title.length>15){
-                              height = (((title.length)~/10 )+ 2.5);
+                              height = (((title.length)~/10 )+ 2.0);
                             }else{
-                              height = ((title.length)~/50 + 2.1);
+                              height = ((title.length)~/50 + 1.8);
                             }
                             return StaggeredTile.count(2, height);
                           }
