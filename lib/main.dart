@@ -56,7 +56,10 @@ class _AppState extends State<MyApp> {
                     );
                   }else{
                     print("found data ${snap.data.id}");
-                    return HomeScreen(true);
+                    return ChangeNotifierProvider(
+                      child: LoginScreen(),
+                      create: (context) => LoginData(),
+                    );
                   }
                 }
                 return HomeScreen(false);

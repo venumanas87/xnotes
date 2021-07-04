@@ -80,7 +80,12 @@ class _LoginState extends State<LoginScreen>{
                   height: 30,
                 ),
                 FloatingActionButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    checkifUnique();
+                  },
+                  child: Icon(Icons.navigate_next_rounded,
+                  size:30 ,
+                  ),
                 )
               ],
             ),
