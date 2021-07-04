@@ -81,7 +81,11 @@ class _LoginState extends State<LoginScreen>{
                 ),
                 FloatingActionButton(
                   onPressed: (){
-                    checkifUnique();
+                    if(redirect){
+                      continueLogin();
+                    }else {
+                      checkifUnique();
+                    }
                   },
                   child: Icon(Icons.navigate_next_rounded,
                   size:30 ,
@@ -122,12 +126,6 @@ class _LoginState extends State<LoginScreen>{
       loginInfo.setTrue();
       loginInfo.setSuccessColor();
       loginInfo.setTextPassword();
-      // firestore.collection("xnotes").doc("quickyquick").collection("ids")
-      //     .add({
-      //   "id" : myController.text
-      // });
-
-     // Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(true)));
     }
 
 
@@ -159,7 +157,8 @@ class _LoginState extends State<LoginScreen>{
       }
     }else{
       firestore.collection("xnotes").doc("quickyquick").collection("ids")
-          .add({
+      .doc(uid)
+          .set({
         "id" : uid,
         "pass" : pass
       });

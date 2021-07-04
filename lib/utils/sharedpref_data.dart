@@ -4,6 +4,7 @@ import 'package:xnotes/models/login_data.dart';
 class SharedPref {
   static String UID = "uid";
   static String PASS = "password";
+  static String DOCID = "docid";
 
   saveAppState(String uid,String pass) async{
     SharedPreferences sp = await SharedPreferences.getInstance();

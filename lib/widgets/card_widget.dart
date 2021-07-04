@@ -7,32 +7,38 @@ import 'package:xnotes/utils/uiColors.dart';
 
 class CardWidget extends StatelessWidget {
   String heading;
+  String text;
 
-  CardWidget(this.heading);
+  CardWidget(this.heading,this.text);
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20)
+      ),
       color: AppColors.lightBg,
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: SizedBox(
-          height: 200,
-
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
-                  heading,
-                  style: GoogleFonts.poppins(
-                      textStyle: TextStyle(color: Color(0xffffffff))
-                  ),
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+           Flexible(
+              child: Text(
+                heading,
+                style: GoogleFonts.poppins(
+                    textStyle: TextStyle(color: Color(0xffffffff))
                 ),
               ),
+            ),
+            Text(
+              text,
+              style: GoogleFonts.poppins(
+                  textStyle: TextStyle(color: Color(0x80ffffff))
+              ),
+            )
 
-            ]
-          ),
+          ]
         ),
       ),
     );

@@ -21,6 +21,8 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  flutter_staggered_grid_view:
+  animations: ^2.0.0
   shared_preferences:
   provider: any
   google_fonts:
