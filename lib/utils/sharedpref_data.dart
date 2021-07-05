@@ -6,16 +6,21 @@ class SharedPref {
   static String PASS = "password";
   static String DOCID = "docid";
 
-  saveAppState(String uid,String pass) async{
+  saveAppState(String uid, String pass) async {
     SharedPreferences sp = await SharedPreferences.getInstance();
-    sp.setString(UID,uid);
+    sp.setString(UID, uid);
     sp.setString(PASS, pass);
   }
 
-  Future<User> getAppState() async{
+  Future<User> getAppState() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
     String id = sp.getString(UID);
     String pass = sp.getString(PASS);
-    return new User(id,pass);
+    return new User(id, pass);
+  }
+
+  clearState() async{
+    SharedPreferences sp = await SharedPreferences.getInstance();
+    sp.clear();
   }
 }

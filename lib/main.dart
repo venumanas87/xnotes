@@ -12,21 +12,22 @@ import 'models/login_data.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-      MaterialApp(home: MyApp(),
-  theme: ThemeData(
-    primaryColor: AppColors.accent,
-    primaryColorDark: AppColors.darkBg,
-    accentColor: AppColors.accent
-  ),));
+  runApp(MaterialApp(
+    home: ScrollConfiguration(
+      behavior: MyBehavior(),
+        child: MyApp()
+    ),
+    theme: ThemeData(
+        primaryColor: AppColors.accent,
+        primaryColorDark: AppColors.darkBg,
+        accentColor: AppColors.accent),
+  ));
 }
 
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
   @override
   _AppState createState() => _AppState();
-
-
 }
 
 class _AppState extends State<MyApp> {
@@ -47,21 +48,20 @@ class _AppState extends State<MyApp> {
         if (snapshot.connectionState == ConnectionState.done) {
           return FutureBuilder<User>(
               future: SharedPref().getAppState(),
-              builder: (context,snap){
-                if (snap.connectionState == ConnectionState.done){
-                  if(snap.data.id == null) {
+              builder: (context, snap) {
+                if (snap.connectionState == ConnectionState.done) {
+                  if (snap.data.id == null) {
                     return ChangeNotifierProvider(
                       child: LoginScreen(),
                       create: (context) => LoginData(),
                     );
-                  }else{
+                  } else {
                     print("found data ${snap.data.id}");
                     return HomeScreen(true);
                   }
                 }
                 return HomeScreen(false);
-          }
-          );
+              });
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
@@ -71,5 +71,4 @@ class _AppState extends State<MyApp> {
       },
     );
   }
-
 }
