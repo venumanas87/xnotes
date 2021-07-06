@@ -7,3 +7,4 @@ Components Used -:
 - Firestore
 - Provider
 - BLoC
+- Shared Preference
